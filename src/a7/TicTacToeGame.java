@@ -9,7 +9,7 @@ public class TicTacToeGame {
         /* Create top level window. */
 
         JFrame main_frame = new JFrame();
-        main_frame.setTitle("Example");
+        main_frame.setTitle("TicTacToe");
         main_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         /* Create panel for content. Uses BorderLayout. */
