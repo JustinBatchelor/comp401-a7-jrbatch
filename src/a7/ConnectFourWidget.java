@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 
 public class ConnectFourWidget extends JPanel implements ActionListener, SpotListener {
 
@@ -16,6 +17,8 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
     private JLabel _message;
     private boolean _gameWon;
     private Player _nextToPlay;
+    private Color _winningColor;
+    private boolean _didBreak;
 
     public ConnectFourWidget() {
         _board = new JSpotBoard(7, 6,
@@ -48,6 +51,7 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         }
         _nextToPlay = Player.RED;
         _gameWon = false;
+        _didBreak = false;
         _message.setText("Welcome to ConnectFour. Red to play");
     }
 
@@ -55,7 +59,7 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         int spotx = spot.getSpotX();
         int spoty = spot.getSpotY();
 
-        if (_gameWon || !spot.isEmpty()) {
+        if (_gameWon) {
             return;
         }
 
@@ -75,16 +79,15 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
             _nextToPlay = Player.RED;
         }
 
-        for (y=0; y<_board.getSpotHeight(); y++) {
-            if (_board.getSpotAt(spotx, y).isEmpty()) {
+        for (y=_board.getSpotHeight()-1; y>-1; y--) {
+            if (_board.getSpotAt(spotx,y).isEmpty()) {
+                _board.getSpotAt(spotx,y).setSpotColor(player_color);
+                _board.getSpotAt(spotx,y).toggleSpot();
+                _board.getSpotAt(spotx,y).unhighlightSpot();
+                break;
             }
         }
-
-        spot.setSpotColor(player_color);
-        spot.toggleSpot();
-        spot.unhighlightSpot();
-
-
+        checkGameStatus();
 
         if (!spot.isEmpty()) {
             _message.setText(next_player_name + " to play.");
@@ -128,8 +131,51 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         }
 
     }
-
     public void actionPerformed(ActionEvent e) {
         resetGame();
+    }
+
+    private boolean checkGameStatus(){
+        Color red = Color.RED;
+        Color black = Color.BLACK;
+
+        int width = _board.getWidth();
+        int height = _board.getSpotHeight();
+
+        for (x=0; x<width-3; x++) {
+            for (y=0;y<height-3; y++) {
+                Spot currentSpot = _board.getSpotAt(x,y);
+                Color currentColor = currentSpot.getSpotColor();
+
+                // X Spots
+                Spot spotXPlus1 = _board.getSpotAt((x+1), y);
+                Spot spotXPlus2 = _board.getSpotAt((x+2), y);
+                Spot sportXPlus3 = _board.getSpotAt((x+3), y);
+
+                // Y Spots
+                Spot spotYPlus1 = _board.getSpotAt(x, (y+1));
+                Spot spotYPlus2 = _board.getSpotAt(x, (y+2));
+                Spot sportYPlus3 = _board.getSpotAt(x, (y+3));
+
+                if (currentSpot.getSpotColor() != Color.RED || currentSpot.getSpotColor() != Color.BLACK) {
+                    continue;
+                }
+                // Horizontal Checks
+                if (currentColor == spotXPlus1.getSpotColor() &&
+                currentColor == spotXPlus2.getSpotColor() &&
+                currentColor == sportXPlus3.getSpotColor()) {
+                    _winningColor = currentColor;
+                    _gameWon = true;
+                    _didBreak = true;
+                    break;
+                }
+            }
+
+            if (_didBreak) {
+                break;
+            }
+        }
+
+        return _gameWon;
     }
 }
