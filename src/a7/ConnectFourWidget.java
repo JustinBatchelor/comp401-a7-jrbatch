@@ -40,7 +40,6 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         add(reset_message_panel, BorderLayout.SOUTH);
 
         _board.addSpotListener(this);
-
         resetGame();
     }
 
@@ -48,6 +47,8 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
     private void resetGame(){
         for (Spot s : _board) {
             s.clearSpot();
+            s.setSpotColor(Color.WHITE);
+            s.unhighlightSpot();
         }
         _nextToPlay = Player.RED;
         _gameWon = false;
@@ -91,7 +92,7 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
 
         _message.setText(next_player_name + " to play.");
 
-        if (checkVerticalWin(Color.RED,Color.BLACK)  || checkHorizontalWin(Color.RED,Color.BLACK)) {
+        if (checkVerticalWin(Color.RED,Color.BLACK) || checkHorizontalWin(Color.RED, Color.BLACK)) {
             _gameWon = true;
         }
 
@@ -139,9 +140,9 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
     }
 
     private boolean checkVerticalWin(Color redPlayer, Color blackPlayer){
-
         for(y=0; y<_board.getSpotHeight()-3; y++) {
             for(x=0; x<_board.getSpotWidth(); x++) {
+
                 if (_board.getSpotAt(x, y).isEmpty()) {
                     continue;
                 }
@@ -149,7 +150,12 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
                         (_board.getSpotAt(x, (y + 1)).getSpotColor() == redPlayer) &&
                         (_board.getSpotAt(x, (y + 2)).getSpotColor() == redPlayer) &&
                         (_board.getSpotAt(x, (y + 3)).getSpotColor() == redPlayer)) {
+                    unhighlight();
                     _winningColor = redPlayer;
+                    _board.getSpotAt(x,y).highlightSpot();
+                    _board.getSpotAt(x,(y+1)).highlightSpot();
+                    _board.getSpotAt(x,(y+2)).highlightSpot();
+                    _board.getSpotAt(x,(y+3)).highlightSpot();
                     return true;
                 }
             }
@@ -163,52 +169,69 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
                         (_board.getSpotAt(x, (y + 1)).getSpotColor() == blackPlayer) &&
                         (_board.getSpotAt(x, (y + 2)).getSpotColor() == blackPlayer) &&
                         (_board.getSpotAt(x, (y + 3)).getSpotColor() == blackPlayer)) {
+                    unhighlight();
                     _winningColor = blackPlayer;
+                    _board.getSpotAt(x,y).highlightSpot();
+                    _board.getSpotAt(x,(y+1)).highlightSpot();
+                    _board.getSpotAt(x,(y+2)).highlightSpot();
+                    _board.getSpotAt(x,(y+3)).highlightSpot();
                     return true;
                 }
             }
         }
-
         return false;
     }
 
     private boolean checkHorizontalWin(Color redPlayer, Color blackPlayer){
 
-        for(x=0; y<_board.getSpotHeight(); y++) {
-            for(x=0; x<_board.getSpotWidth()-3; x++) {
-                if ((_board.getSpotAt(x,y).getSpotColor() == redPlayer) &&
-                        (_board.getSpotAt((x+1),y).getSpotColor() == redPlayer) &&
-                        (_board.getSpotAt((x+2),y).getSpotColor() == redPlayer) &&
-                        (_board.getSpotAt((x+3),y).getSpotColor() == redPlayer)) {
-                    _winningColor = redPlayer;
-                    return true;
-                }
-            }
-        }
+        // For some reason I had to nest all these if statements
+        // Will come back and re-evaluate later
         for(y=0; y<_board.getSpotHeight(); y++) {
-            for(x=0; x<_board.getSpotWidth()-3; x++) {
-                if ((_board.getSpotAt(x,y).getSpotColor() == blackPlayer) &&
-                        (_board.getSpotAt((x+1),y).getSpotColor() == blackPlayer) &&
-                        (_board.getSpotAt((x+2),y).getSpotColor() == blackPlayer) &&
-                        (_board.getSpotAt((x+3),y).getSpotColor() == blackPlayer)) {
-                    _winningColor = blackPlayer;
-                    return true;
+            for (x=0; x<_board.getSpotWidth()-3; x++) {
+                if (_board.getSpotAt(x,y).getSpotColor() == redPlayer) {
+                    if (_board.getSpotAt((x+1),y).getSpotColor() == redPlayer) {
+                        if (_board.getSpotAt((x+2),y).getSpotColor() == redPlayer) {
+                            if (_board.getSpotAt((x+3),y).getSpotColor() == redPlayer) {
+                                unhighlight();
+                                _winningColor = redPlayer;
+                                _board.getSpotAt(x,y).highlightSpot();
+                                _board.getSpotAt((x+1),y).highlightSpot();
+                                _board.getSpotAt((x+2),y).highlightSpot();
+                                _board.getSpotAt((x+3),y).highlightSpot();
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (y=0; y<_board.getSpotHeight(); y++) {
+            for (x=0; x<_board.getSpotWidth()-3; x++) {
+                if (_board.getSpotAt(x,y).getSpotColor() == blackPlayer) {
+                    if (_board.getSpotAt((x+1),y).getSpotColor() == blackPlayer) {
+                        if (_board.getSpotAt((x+2),y).getSpotColor() == blackPlayer) {
+                            if (_board.getSpotAt((x+3),y).getSpotColor() == blackPlayer) {
+                                unhighlight();
+                                _winningColor = blackPlayer;
+                                _board.getSpotAt(x,y).highlightSpot();
+                                _board.getSpotAt((x+1),y).highlightSpot();
+                                _board.getSpotAt((x+2),y).highlightSpot();
+                                _board.getSpotAt((x+3),y).highlightSpot();
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
         }
         return false;
     }
 
-    private boolean OutOfRange(int x, int y) {
-        int height = _board.getSpotHeight();
-        int width = _board.getSpotWidth();
-
-        if (y>height || (y+1)>height || (y+2)>height || (y+3)>height ||
-            x>width || (x+1)>width || (x+2)>width || (x+3)>width) {
-            return true;
-        }
-        else {
-            return false;
+    private void unhighlight() {
+        for (Spot s : _board) {
+            s.unhighlightSpot();
         }
     }
+
 }

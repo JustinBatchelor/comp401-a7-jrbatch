@@ -64,6 +64,7 @@ public class JSpotBoard extends JPanel implements SpotBoard {
 				_spots[x][y] = new JSpot(backgroundColor, DEFAULT_SPOT_COLOR, DEFAULT_HIGHLIGHT_COLOR, this, x, y);
 				((JSpot)_spots[x][y]).setPreferredSize(preferred_size);
 				add(((JSpot) _spots[x][y]));
+
 			}
 		}
 	}
@@ -79,12 +80,12 @@ public class JSpotBoard extends JPanel implements SpotBoard {
 			for (int x=0; x<width; x++) {
 				if (x==0 || x==2 || x==4 || x==6) {
 					_spots[x][y] = new JSpot(column1, DEFAULT_SPOT_COLOR, DEFAULT_HIGHLIGHT_COLOR, this, x, y);
-
 				} else {
 					_spots[x][y] = new JSpot(column2, DEFAULT_SPOT_COLOR, DEFAULT_HIGHLIGHT_COLOR, this, x, y);
 				}
 				((JSpot)_spots[x][y]).setPreferredSize(preferred_size);
 				add(((JSpot) _spots[x][y]));
+
 			}
 		}
 	}
