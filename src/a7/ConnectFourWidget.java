@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.Iterator;
 
 public class ConnectFourWidget extends JPanel implements ActionListener, SpotListener {
@@ -18,7 +19,6 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
     private boolean _gameWon;
     private Player _nextToPlay;
     private Color _winningColor;
-    private boolean _didBreak;
 
     public ConnectFourWidget() {
         _board = new JSpotBoard(7, 6,
@@ -51,7 +51,7 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         }
         _nextToPlay = Player.RED;
         _gameWon = false;
-        _didBreak = false;
+        _winningColor = null;
         _message.setText("Welcome to ConnectFour. Red to play");
     }
 
@@ -59,9 +59,10 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         int spotx = spot.getSpotX();
         int spoty = spot.getSpotY();
 
-        if (_gameWon) {
+        if (_gameWon || !_board.getSpotAt(spotx, 0).isEmpty()) {
             return;
         }
+
 
         String player_name = null;
         String next_player_name = null;
@@ -87,11 +88,13 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
                 break;
             }
         }
-        checkGameStatus();
 
-        if (!spot.isEmpty()) {
-            _message.setText(next_player_name + " to play.");
+        _message.setText(next_player_name + " to play.");
+
+        if (checkVerticalWin(Color.RED,Color.BLACK)  || checkHorizontalWin(Color.RED,Color.BLACK)) {
+            _gameWon = true;
         }
+
 
         if (_gameWon) {
             _message.setText(player_name + " won the game!!!");
@@ -135,47 +138,77 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         resetGame();
     }
 
-    private boolean checkGameStatus(){
-        Color red = Color.RED;
-        Color black = Color.BLACK;
+    private boolean checkVerticalWin(Color redPlayer, Color blackPlayer){
 
-        int width = _board.getWidth();
-        int height = _board.getSpotHeight();
-
-        for (x=0; x<width-3; x++) {
-            for (y=0;y<height-3; y++) {
-                Spot currentSpot = _board.getSpotAt(x,y);
-                Color currentColor = currentSpot.getSpotColor();
-
-                // X Spots
-                Spot spotXPlus1 = _board.getSpotAt((x+1), y);
-                Spot spotXPlus2 = _board.getSpotAt((x+2), y);
-                Spot sportXPlus3 = _board.getSpotAt((x+3), y);
-
-                // Y Spots
-                Spot spotYPlus1 = _board.getSpotAt(x, (y+1));
-                Spot spotYPlus2 = _board.getSpotAt(x, (y+2));
-                Spot sportYPlus3 = _board.getSpotAt(x, (y+3));
-
-                if (currentSpot.getSpotColor() != Color.RED || currentSpot.getSpotColor() != Color.BLACK) {
+        for(y=0; y<_board.getSpotHeight()-3; y++) {
+            for(x=0; x<_board.getSpotWidth(); x++) {
+                if (_board.getSpotAt(x, y).isEmpty()) {
                     continue;
                 }
-                // Horizontal Checks
-                if (currentColor == spotXPlus1.getSpotColor() &&
-                currentColor == spotXPlus2.getSpotColor() &&
-                currentColor == sportXPlus3.getSpotColor()) {
-                    _winningColor = currentColor;
-                    _gameWon = true;
-                    _didBreak = true;
-                    break;
+                if ((_board.getSpotAt(x, y).getSpotColor() == redPlayer) &&
+                        (_board.getSpotAt(x, (y + 1)).getSpotColor() == redPlayer) &&
+                        (_board.getSpotAt(x, (y + 2)).getSpotColor() == redPlayer) &&
+                        (_board.getSpotAt(x, (y + 3)).getSpotColor() == redPlayer)) {
+                    _winningColor = redPlayer;
+                    return true;
                 }
             }
-
-            if (_didBreak) {
-                break;
+        }
+        for(y=0; y<_board.getSpotHeight()-3; y++) {
+            for(x=0; x<_board.getSpotWidth(); x++) {
+                if (_board.getSpotAt(x, y).isEmpty()) {
+                    continue;
+                }
+                if ((_board.getSpotAt(x, y).getSpotColor() == blackPlayer) &&
+                        (_board.getSpotAt(x, (y + 1)).getSpotColor() == blackPlayer) &&
+                        (_board.getSpotAt(x, (y + 2)).getSpotColor() == blackPlayer) &&
+                        (_board.getSpotAt(x, (y + 3)).getSpotColor() == blackPlayer)) {
+                    _winningColor = blackPlayer;
+                    return true;
+                }
             }
         }
 
-        return _gameWon;
+        return false;
+    }
+
+    private boolean checkHorizontalWin(Color redPlayer, Color blackPlayer){
+
+        for(x=0; y<_board.getSpotHeight(); y++) {
+            for(x=0; x<_board.getSpotWidth()-3; x++) {
+                if ((_board.getSpotAt(x,y).getSpotColor() == redPlayer) &&
+                        (_board.getSpotAt((x+1),y).getSpotColor() == redPlayer) &&
+                        (_board.getSpotAt((x+2),y).getSpotColor() == redPlayer) &&
+                        (_board.getSpotAt((x+3),y).getSpotColor() == redPlayer)) {
+                    _winningColor = redPlayer;
+                    return true;
+                }
+            }
+        }
+        for(y=0; y<_board.getSpotHeight(); y++) {
+            for(x=0; x<_board.getSpotWidth()-3; x++) {
+                if ((_board.getSpotAt(x,y).getSpotColor() == blackPlayer) &&
+                        (_board.getSpotAt((x+1),y).getSpotColor() == blackPlayer) &&
+                        (_board.getSpotAt((x+2),y).getSpotColor() == blackPlayer) &&
+                        (_board.getSpotAt((x+3),y).getSpotColor() == blackPlayer)) {
+                    _winningColor = blackPlayer;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean OutOfRange(int x, int y) {
+        int height = _board.getSpotHeight();
+        int width = _board.getSpotWidth();
+
+        if (y>height || (y+1)>height || (y+2)>height || (y+3)>height ||
+            x>width || (x+1)>width || (x+2)>width || (x+3)>width) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
