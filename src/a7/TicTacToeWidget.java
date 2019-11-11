@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class TicTacToeWidget extends JPanel implements ActionListener, SpotListener {
@@ -19,7 +18,6 @@ public class TicTacToeWidget extends JPanel implements ActionListener, SpotListe
     private JLabel _message;
     private boolean _gameWon;
     private boolean _stalemate;
-    private boolean _didbreak;
     private Player _nextToPlay;
     private int _counter;
 
@@ -52,8 +50,8 @@ public class TicTacToeWidget extends JPanel implements ActionListener, SpotListe
         add(reset_message_panel, BorderLayout.SOUTH);
 
         _board.addSpotListener(this);
-        _winningComboList = new ArrayList<>();
 
+        _winningComboList = new ArrayList<>();
 
         winningCombo1 = new Integer[]{0,0,1,0,2,0}; // top row
         winningCombo2 = new Integer[]{0,1,1,1,2,1}; // middle row
@@ -83,9 +81,8 @@ public class TicTacToeWidget extends JPanel implements ActionListener, SpotListe
         _nextToPlay = Player.WHITE;
         _gameWon = false;
         _stalemate = false;
-        _didbreak = false;
         _counter = 1;
-        _message.setText("Welcome to the TicTacToe. White to play");
+        _message.setText("Welcome to TicTacToe. White to play");
     }
 
     public void spotClicked(Spot spot) {
@@ -134,7 +131,7 @@ public class TicTacToeWidget extends JPanel implements ActionListener, SpotListe
         }
 
         if (!spot.isEmpty()) {
-            _message.setText(player_name + " played " + spot.getCoordString() + ". " + next_player_name + " to play.");
+            _message.setText(next_player_name + " to play.");
         }
 
         if (_gameWon) {
@@ -142,7 +139,7 @@ public class TicTacToeWidget extends JPanel implements ActionListener, SpotListe
         }
 
         if (_stalemate) {
-            _message.setText("Stalemate");
+            _message.setText("Draw!!!");
         }
 
         _counter = 0;

@@ -68,6 +68,27 @@ public class JSpotBoard extends JPanel implements SpotBoard {
 		}
 	}
 
+	public JSpotBoard(int width, int height, Color column1, Color column2) {
+		if (width < 1 || height < 1 || width > 50 || height > 50) {
+			throw new IllegalArgumentException("Illegal spot board geometry");
+		}
+		setLayout(new GridLayout(height, width));
+		_spots = new Spot[width][height];
+		Dimension preferred_size = new Dimension(DEFAULT_SCREEN_WIDTH/width, DEFAULT_SCREEN_HEIGHT/height);
+		for (int y=0; y<height; y++) {
+			for (int x=0; x<width; x++) {
+				if (x==0 || x==2 || x==4 || x==6) {
+					_spots[x][y] = new JSpot(column1, DEFAULT_SPOT_COLOR, DEFAULT_HIGHLIGHT_COLOR, this, x, y);
+
+				} else {
+					_spots[x][y] = new JSpot(column2, DEFAULT_SPOT_COLOR, DEFAULT_HIGHLIGHT_COLOR, this, x, y);
+				}
+				((JSpot)_spots[x][y]).setPreferredSize(preferred_size);
+				add(((JSpot) _spots[x][y]));
+			}
+		}
+	}
+
 	// Getters for SpotWidth and SpotHeight properties
 	
 	@Override
