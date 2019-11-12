@@ -109,13 +109,10 @@ public class JSpotBoard extends JPanel implements SpotBoard {
 		if (x < 0 || x >= getSpotWidth() || y < 0 || y >= getSpotHeight()) {
 			throw new IllegalArgumentException("Illegal spot coordinates");
 		}
-		
 		return _spots[x][y];
 	}
-	
 	// Convenience methods for (de)registering spot listeners.
-	
-	@Override
+
 	public void addSpotListener(SpotListener spot_listener) {
 		for (int x=0; x<getSpotWidth(); x++) {
 			for (int y=0; y<getSpotHeight(); y++) {
@@ -123,8 +120,7 @@ public class JSpotBoard extends JPanel implements SpotBoard {
 			}
 		}
 	}
-	
-	@Override
+
 	public void removeSpotListener(SpotListener spot_listener) {
 		for (int x=0; x<getSpotWidth(); x++) {
 			for (int y=0; y<getSpotHeight(); y++) {
@@ -133,7 +129,6 @@ public class JSpotBoard extends JPanel implements SpotBoard {
 		}
 	}
 
-	@Override
 	public Iterator<Spot> iterator() {
 		return new SpotBoardIterator(this);
 	}
