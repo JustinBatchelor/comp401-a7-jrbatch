@@ -19,6 +19,7 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
     private boolean _gameWon;
     private Player _nextToPlay;
     private Color _winningColor;
+    private boolean _stalemate;
 
     public ConnectFourWidget() {
         _board = new JSpotBoard(7, 6,
@@ -53,6 +54,7 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         _nextToPlay = Player.RED;
         _gameWon = false;
         _winningColor = null;
+        _stalemate = false;
         _message.setText("Welcome to ConnectFour. Red to play");
     }
 
@@ -95,10 +97,19 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
             _gameWon = true;
         }
 
+        if (isADraw()) {
+            _gameWon = true;
+            _stalemate = true;
+        }
 
 
-        if (_gameWon) {
+
+        if (_gameWon && !_stalemate) {
             _message.setText(player_name + " won the game!!!");
+        }
+
+        if (_gameWon && _stalemate) {
+            _message.setText("It's a Draw.  Press the restart button to play again");
         }
 
     }
@@ -311,17 +322,23 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
         return false;
     }
 
+    private boolean isADraw() {
+        for (y=0; y<_board.getSpotHeight(); y++) {
+            for (x=0; x<_board.getSpotWidth(); x++) {
+                if (_board.getSpotAt(x, y).isEmpty()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     private void unhighlight() {
         for (Spot s : _board) {
             s.unhighlightSpot();
         }
     }
 
-    private boolean isOutOfRange(int x, int y) {
-        if (x>_board.getSpotWidth() || y>_board.getSpotHeight()) {
-            return true;
-        }
-        return false;
-    }
 
 }
