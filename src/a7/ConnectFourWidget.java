@@ -102,8 +102,6 @@ public class ConnectFourWidget extends JPanel implements ActionListener, SpotLis
             _stalemate = true;
         }
 
-
-
         if (_gameWon && !_stalemate) {
             _message.setText(player_name + " won the game!!!");
         }
