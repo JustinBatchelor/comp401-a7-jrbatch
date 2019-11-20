@@ -20,8 +20,11 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
     private enum Player{BLACK, WHITE};
     private boolean _gameWon;
     private boolean _stalemate;
+
+    private String _playerName;
     private Player _nextToPlay;
     private Color _nextToPlayColor;
+
     private Color _winningColor;
     private JSpotBoard _board;
     private JLabel _message;
@@ -48,19 +51,23 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
             next_player_name = "Black";
             _nextToPlay = Player.BLACK;
             _nextToPlayColor = Color.BLACK;
+            _playerName = "Black";
         } else {
             player_color = Color.BLACK;
             player_name = "Black";
             next_player_name = "White";
             _nextToPlay = Player.WHITE;
             _nextToPlayColor = Color.WHITE;
+            _playerName = "White";
         }
         _message.setText(next_player_name + " to play");
         resetMainList();
         scoreCounter(gameOver());
 
         if (_gameWon && !_stalemate) {
-            _message.setText(player_name + " won the game!!!");
+            _message.setText("Black Scored " + _blackScore + " points. " +
+                    "White Scored " + _whiteScore + " points " +
+                    player_name + " Wins");
         }
 
         if (_gameWon && _stalemate) {
@@ -69,43 +76,24 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
     }
 
     public void spotEntered(Spot spot) {
-        int spotX = spot.getSpotX();
-        int spotY = spot.getSpotY();
         if (_gameWon || !spot.isEmpty()) {
            return;
-       }
-        ValidMoveChecker northChecker = new ValidMoveChecker(_nextToPlayColor, new NorthIterator(_board, spotX,spotY));
-        ValidMoveChecker eastChecker = new ValidMoveChecker( _nextToPlayColor, new EastIterator(_board, spotX, spotY));
-        ValidMoveChecker southChecker = new ValidMoveChecker(_nextToPlayColor, new SouthIterator(_board,spotX, spotY));
-        ValidMoveChecker westChecker = new ValidMoveChecker(_nextToPlayColor, new WestIterator(_board, spotX,spotY));
-        ValidMoveChecker northWestChecker = new ValidMoveChecker(_nextToPlayColor, new NorthWestIterator(_board,spotX,spotY));
-        ValidMoveChecker northEastChecker = new ValidMoveChecker(_nextToPlayColor, new NorthEastIterator(_board,spotX,spotY));
-        ValidMoveChecker southEastChecker = new ValidMoveChecker( _nextToPlayColor, new SouthEastIterator(_board,spotX,spotY));
-        ValidMoveChecker southWestChecker = new ValidMoveChecker( _nextToPlayColor, new SouthWestIterator(_board, spotX, spotY));
-
-        boolean north = northChecker.checkForValidMove();
-        boolean east = eastChecker.checkForValidMove();
-        boolean south = southChecker.checkForValidMove();
-        boolean west = westChecker.checkForValidMove();
-        boolean northWest = northWestChecker.checkForValidMove();
-        boolean northEast = northEastChecker.checkForValidMove();
-        boolean southEast = southEastChecker.checkForValidMove();
-        boolean southWest = southWestChecker.checkForValidMove();
-
-        addSpotListToMainList(northChecker.getSpotListToFlip());
-        addSpotListToMainList(eastChecker.getSpotListToFlip());
-        addSpotListToMainList(southChecker.getSpotListToFlip());
-        addSpotListToMainList(westChecker.getSpotListToFlip());
-        addSpotListToMainList(northWestChecker.getSpotListToFlip());
-        addSpotListToMainList(northEastChecker.getSpotListToFlip());
-        addSpotListToMainList(southEastChecker.getSpotListToFlip());
-        addSpotListToMainList(southWestChecker.getSpotListToFlip());
-
-        if (!_listOfSpotsToFlip.isEmpty()) {
+        }
+        if (hasValidMove(spot)) {
             spot.highlightSpot();
         }
-
-
+        else if(hasNoValidMove() && !_gameWon) {
+            // Means that the current player doesn't have a valid move
+            _message.setText(_playerName + " has no valid Move");
+            switchPlayer(_nextToPlayColor);
+            _message.setText(_playerName + " to play");
+            if (hasNoValidMove()) {
+                // if this block runs.. neither player has a valid move
+                _gameWon = true;
+                _stalemate = true;
+                _message.setText("Neither player has valid move.  It's a draw! ");
+            }
+        }
     }
 
     public void spotExited(Spot spot) {
@@ -150,6 +138,7 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
         _stalemate = false;
         _whiteScore = 0;
         _blackScore = 0;
+        _playerName = "Black";
         setInitialGameBoard();
         _message.setText("Welcome to Othello. Black to play");
     }
@@ -207,15 +196,71 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
         }
     }
 
+    private boolean hasValidMove(Spot passedSpot) {
+        // This method will be called when a spot is entered, we will pass through the spot the mouse is on
+        // then create a new Class "ValidMoveChecker" that will store an individual iterator.
+        // Each Iterator will move in a different direction for a total of 8 directions conventionally named
+        // based on a compass direction
+        int spotX = passedSpot.getSpotX();
+        int spotY = passedSpot.getSpotY();
+
+        ValidMoveChecker northChecker = new ValidMoveChecker(_nextToPlayColor, new NorthIterator(_board, spotX,spotY));
+        ValidMoveChecker eastChecker = new ValidMoveChecker( _nextToPlayColor, new EastIterator(_board, spotX, spotY));
+        ValidMoveChecker southChecker = new ValidMoveChecker(_nextToPlayColor, new SouthIterator(_board,spotX, spotY));
+        ValidMoveChecker westChecker = new ValidMoveChecker(_nextToPlayColor, new WestIterator(_board, spotX,spotY));
+        ValidMoveChecker northWestChecker = new ValidMoveChecker(_nextToPlayColor, new NorthWestIterator(_board,spotX,spotY));
+        ValidMoveChecker northEastChecker = new ValidMoveChecker(_nextToPlayColor, new NorthEastIterator(_board,spotX,spotY));
+        ValidMoveChecker southEastChecker = new ValidMoveChecker( _nextToPlayColor, new SouthEastIterator(_board,spotX,spotY));
+        ValidMoveChecker southWestChecker = new ValidMoveChecker( _nextToPlayColor, new SouthWestIterator(_board, spotX, spotY));
+
+        boolean north = northChecker.checkForValidMove();
+        boolean east = eastChecker.checkForValidMove();
+        boolean south = southChecker.checkForValidMove();
+        boolean west = westChecker.checkForValidMove();
+        boolean northWest = northWestChecker.checkForValidMove();
+        boolean northEast = northEastChecker.checkForValidMove();
+        boolean southEast = southEastChecker.checkForValidMove();
+        boolean southWest = southWestChecker.checkForValidMove();
+
+        addSpotListToMainList(northChecker.getSpotListToFlip());
+        addSpotListToMainList(eastChecker.getSpotListToFlip());
+        addSpotListToMainList(southChecker.getSpotListToFlip());
+        addSpotListToMainList(westChecker.getSpotListToFlip());
+        addSpotListToMainList(northWestChecker.getSpotListToFlip());
+        addSpotListToMainList(northEastChecker.getSpotListToFlip());
+        addSpotListToMainList(southEastChecker.getSpotListToFlip());
+        addSpotListToMainList(southWestChecker.getSpotListToFlip());
+        return !_listOfSpotsToFlip.isEmpty();
+    }
+
+    private boolean hasNoValidMove() {
+        List<Spot> listOfValidSpotsToMove = new ArrayList<>();
+        for(y=0; y<_board.getSpotHeight(); y++) {
+            for(x=0; x<_board.getSpotWidth(); x++) {
+                Spot spot = _board.getSpotAt(x,y);
+                if (spot.getSpotColor() == Color.GREEN) {
+                    if (hasValidMove(spot)) {
+                        listOfValidSpotsToMove.add(spot);
+                    }
+                }
+            }
+        }
+        return listOfValidSpotsToMove.isEmpty();
+    }
+
     // Switches Player will be called if there is no valid move in spot entered
     private void switchPlayer(Color playerColor) {
-        if (playerColor == Color.BLACK) {
-            _nextToPlay = Player.WHITE;
-            _nextToPlayColor = Color.WHITE;
-        }
-        if (playerColor == Color.WHITE) {
-            _nextToPlay = Player.BLACK;
-            _nextToPlayColor = Color.BLACK;
+        if (!_gameWon) {
+            if (playerColor == Color.BLACK) {
+                _nextToPlay = Player.WHITE;
+                _nextToPlayColor = Color.WHITE;
+                _playerName = "White";
+            }
+            if (playerColor == Color.WHITE) {
+                _nextToPlay = Player.BLACK;
+                _nextToPlayColor = Color.BLACK;
+                _playerName = "Black";
+            }
         }
     }
 
@@ -224,6 +269,8 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
             for(x=0; x< _board.getSpotWidth(); x++) {
                 Spot spot = _board.getSpotAt(x,y);
                 if (spot.getSpotColor() == Color.GREEN) {
+                    _whiteScore = 0;
+                    _blackScore = 0;
                     return false;
                 }
             }
