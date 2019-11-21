@@ -9,8 +9,6 @@ import java.util.List;
 
 
 public class OthelloWidget extends JPanel implements ActionListener, SpotListener {
-
-
                                               // Variables
     private int x;
     private int y;
@@ -26,6 +24,7 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
     private Color _nextToPlayColor;
 
     private Color _winningColor;
+    private String _winningPlayerName;
     private JSpotBoard _board;
     private JLabel _message;
 
@@ -63,16 +62,6 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
         _message.setText(next_player_name + " to play");
         resetMainList();
         scoreCounter(gameOver());
-
-        if (_gameWon && !_stalemate) {
-            _message.setText("Black Scored " + _blackScore + " points. " +
-                    "White Scored " + _whiteScore + " points " +
-                    player_name + " Wins");
-        }
-
-        if (_gameWon && _stalemate) {
-            _message.setText("It's a Draw.  Press the restart button to play again");
-        }
     }
 
     public void spotEntered(Spot spot) {
@@ -82,18 +71,7 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
         if (hasValidMove(spot)) {
             spot.highlightSpot();
         }
-        else if(hasNoValidMove() && !_gameWon) {
-            // Means that the current player doesn't have a valid move
-            _message.setText(_playerName + " has no valid Move");
-            switchPlayer(_nextToPlayColor);
-            _message.setText(_playerName + " to play");
-            if (hasNoValidMove()) {
-                // if this block runs.. neither player has a valid move
-                _gameWon = true;
-                _stalemate = true;
-                _message.setText("Neither player has valid move.  It's a draw! ");
-            }
-        }
+
     }
 
     public void spotExited(Spot spot) {
@@ -265,6 +243,18 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
     }
 
     private boolean gameOver() {
+        if(hasNoValidMove() && !_gameWon) {
+            // Means that the current player doesn't have a valid move
+            _message.setText(_playerName + " has no valid Move");
+            switchPlayer(_nextToPlayColor);
+            _message.setText(_playerName + " to play");
+            if (hasNoValidMove()) {
+                // if this block runs.. neither player has a valid move
+                _gameWon = true;
+                _stalemate = true;
+                return true;
+            }
+        }
         for (y=0; y<_board.getSpotHeight(); y++) {
             for(x=0; x< _board.getSpotWidth(); x++) {
                 Spot spot = _board.getSpotAt(x,y);
@@ -295,17 +285,29 @@ public class OthelloWidget extends JPanel implements ActionListener, SpotListene
                 _winningColor = Color.WHITE;
                 _stalemate = false;
                 _gameWon =true;
+                _winningPlayerName = "White";
             }
             if (_blackScore > _whiteScore) {
                 _winningColor = Color.BLACK;
                 _stalemate = false;
+                _winningPlayerName = "Black";
                 _gameWon = true;
             }
             if (_whiteScore == _blackScore) {
                 _stalemate = true;
                 _gameWon = true;
             }
+
+            if (!_stalemate) {
+                _message.setText("Black Scored " + _blackScore + " points. " +
+                        "White Scored " + _whiteScore + " points. " +
+                        _winningPlayerName + " Wins");
+            }
+            if (_gameWon && _stalemate) {
+                _message.setText("It's a Draw.  Press the restart button to play again");
+            }
         }
+
     }
 
 }

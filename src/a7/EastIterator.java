@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class EastIterator implements Iterator<Spot> {
-
     private int _currentX;
     private int _currentY;
     private SpotBoard _board;
