@@ -1,5 +1,9 @@
-package a7;
+package a7.Widgets;
 
+
+import a7.JSpotBoard;
+import a7.Spot;
+import a7.SpotListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

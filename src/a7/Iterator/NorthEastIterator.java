@@ -1,4 +1,7 @@
-package a7;
+package a7.Iterator;
+
+import a7.Spot;
+import a7.SpotBoard;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

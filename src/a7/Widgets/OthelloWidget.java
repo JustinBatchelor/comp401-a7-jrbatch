@@ -1,4 +1,7 @@
-package a7;
+package a7.Widgets;
+
+import a7.*;
+import a7.Iterator.*;
 
 import javax.swing.*;
 import java.awt.*;

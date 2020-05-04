@@ -1,5 +1,7 @@
-package a7;
+package a7.Games;
 
+
+import a7.Widgets.ExampleWidget;
 
 import java.awt.BorderLayout;
 

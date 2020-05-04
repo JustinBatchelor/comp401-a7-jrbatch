@@ -1,4 +1,6 @@
-package a7;
+package a7.Games;
+
+import a7.Widgets.ConnectFourWidget;
 
 import javax.swing.*;
 import java.awt.*;
